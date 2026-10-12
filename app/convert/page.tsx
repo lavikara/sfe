@@ -1,9 +1,10 @@
 'use client'
 import { useEffect, useState } from 'react'
-import type { ApiErrorBody, Conversion, Currency, Rate, User } from '@/types/api'
+import type { ApiErrorBody, Conversion, Currency, Rate } from '@/types/api'
 import { CURRENCIES } from '@/types/api'
 import { Button, Card, Input, Money, Select } from '@/components/ui'
-import { convert, getMe, getRate } from '@/lib/api/endpoints'
+import { useUserStore } from '@/store/userStore'
+import { convert, getRate } from '@/lib/api/endpoints'
 import { parseMoney } from '@/lib/format'
 import styles from './page.module.css'
 
@@ -17,12 +18,9 @@ export default function ConvertPage() {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
-  const [user, setUser] = useState<User>()
-  const [rate, setRate] = useState<Rate>()
+  const { user } = useUserStore()
 
-  useEffect(() => {
-    getMe().then((res) => setUser(res.data))
-  }, [])
+  const [rate, setRate] = useState<Rate>()
 
   useEffect(() => {
     getRate(from, to).then((res) => setRate(res.data))
