@@ -2,8 +2,8 @@
 import { useEffect, useState } from 'react'
 import type { User } from '@/types/api'
 import { Avatar, Icon } from '@/components/ui'
-import { getMe } from '@/lib/api/endpoints'
 import styles from './UserMenu.module.css'
+import { useUserStore } from '@/store/userStore'
 
 const TIER_LABELS: Record<User['tier'], string> = {
   basic: 'Basic',
@@ -13,11 +13,12 @@ const TIER_LABELS: Record<User['tier'], string> = {
 
 export function UserMenu() {
   const [open, setOpen] = useState(false)
-  const [user, setUser] = useState<User>()
+
+  const { user, fetchLoggedInUser } = useUserStore()
 
   useEffect(() => {
-    getMe().then((res) => setUser(res.data))
-  }, [])
+    fetchLoggedInUser()
+  }, [fetchLoggedInUser])
 
   return (
     <div className={styles.menu}>
