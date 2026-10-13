@@ -5,6 +5,7 @@ import { StatusDot } from './StatusDot'
 import styles from './TransactionRow.module.css'
 
 const TYPE_ICONS: Record<TransactionType, IconName> = {
+  all_types: 'none',
   deposit: 'arrow-down-left',
   transfer_in: 'arrow-down-left',
   withdrawal: 'arrow-up-right',
