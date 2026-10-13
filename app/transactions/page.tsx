@@ -2,10 +2,11 @@
 import { Suspense, useEffect, useRef, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { TransactionRow, StatusDot } from '@/components/transactions'
-import { Button, Card, Input, Drawer, Select } from '@/components/ui'
+import { Pagination, Card, Input, Drawer, Select } from '@/components/ui'
 import type { TransactionType, TransactionStatus } from '@/types/api'
 import { TRANSACTION_TYPE, TRANSACTION_STATUS } from '@/types/api'
 import { useUserStore } from '@/store/userStore'
+import { useTransactionsStore } from '@/store/transactionsStore'
 import styles from './page.module.css'
 
 function formatOptionLabel(value: string) {
@@ -36,8 +37,14 @@ function TransactionsContent() {
 
   const [searchInput, setSearchInput] = useState(searchParam)
   const lastWrittenSearch = useRef(searchParam)
+  const [page, setPageNumber] = useState(1)
 
   const { user, userLoading } = useUserStore()
+  const { transactions, transactionsLoading, transactionsMeta, fetchTransactions } = useTransactionsStore()
+
+  useEffect(() => {
+    fetchTransactions()
+  }, [fetchTransactions])
 
   useEffect(() => {
     if (searchParam !== lastWrittenSearch.current) {
@@ -92,13 +99,18 @@ function TransactionsContent() {
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
   }
 
+  const setPage = (page: number) => {
+    console.log(page);
+    setPageNumber(page)
+  }
+
   if (userLoading) return <p className={styles.loading}>Loading…</p>
 
   return (
     <div className={styles.page}>
       <header>
         <h1 className={styles.title}>Transactions</h1>
-        <p className={styles.subtitle}>237 transactions</p>
+        <p className={styles.subtitle}>{transactionsMeta?.total || 0} transactions</p>
       </header>
 
       <div className={styles.row}>
@@ -126,9 +138,20 @@ function TransactionsContent() {
           fieldClassName={styles.status}
         />
       </div>
-      <Card padding="none">
+      <Card className={styles.card}>
         <div></div>
       </Card>
+      <Pagination
+        pagination={
+          transactionsMeta
+            ? {
+                ...transactionsMeta,
+                page,
+              }
+            : null
+        }
+        onPageChange={setPage}
+      />
     </div>
   )
 }
