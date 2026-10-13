@@ -1,6 +1,9 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import type { Transaction } from '@/types/api'
+import { TRANSACTION_STATUS, TRANSACTION_TYPE } from '@/types/api'
+import type { TransactionQuery } from '@/lib/api/endpoints'
 import { Pagination, Card, Drawer, Money } from '@/components/ui'
 import { TransactionRow } from '@/components/transactions'
 import { useTransactionsStore } from '@/store/transactionsStore'
@@ -49,19 +52,42 @@ function groupTransactionsByDate(transactions: Transaction[]) {
 
 export function AllTransactions() {
   const [selected, setSelected] = useState<Transaction | null>(null)
-  const [page, setPageNumber] = useState(1)
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const rawPage = Number(searchParams.get('page') ?? 1)
+  const page = Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 1
+  const rawLimit = Number(searchParams.get('limit') ?? 20)
+  const limit = Number.isInteger(rawLimit) && rawLimit > 0 ? rawLimit : 20
+  const queryText = searchParams.get('q') ?? ''
+  const type = TRANSACTION_TYPE.find((value) => value === searchParams.get('type'))
+  const status = TRANSACTION_STATUS.find((value) => value === searchParams.get('status'))
 
   const { transactions, transactionsLoading, transactionsMeta, fetchTransactions } = useTransactionsStore()
 
   const transactionGroups = groupTransactionsByDate(transactions ?? [])
 
   useEffect(() => {
-    fetchTransactions()
-  }, [fetchTransactions])
+    const query: TransactionQuery = {
+      page,
+      limit,
+      ...(queryText ? { q: queryText } : {}),
+      ...(type && type !== 'all_types' ? { type } : {}),
+      ...(status && status !== 'all_statuses' ? { status } : {}),
+    }
 
-  const setPage = (page: number) => {
-    console.log(page)
-    setPageNumber(page)
+    void fetchTransactions(query)
+  }, [fetchTransactions, page, limit, queryText, type, status])
+
+  const setPage = (nextPage: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (nextPage === 1) {
+      params.delete('page')
+    } else {
+      params.set('page', String(nextPage))
+    }
+    const query = params.toString()
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
   }
 
   return (
@@ -99,14 +125,7 @@ export function AllTransactions() {
         </Drawer>
       </Card>
       <Pagination
-        pagination={
-          transactionsMeta
-            ? {
-                ...transactionsMeta,
-                page,
-              }
-            : null
-        }
+        pagination={transactionsMeta}
         onPageChange={setPage}
       />
     </>

@@ -27,13 +27,13 @@ function TransactionsContent() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const searchParam = searchParams.get('search') ?? ''
+  const searchParam = searchParams.get('q') ?? ''
   const rawType = searchParams.get('type')
   const rawStatus = searchParams.get('status')
-  const type: TransactionType | 'All Types' =
-    TRANSACTION_TYPE.find((value) => value === rawType) ?? 'All Types'
-  const status: TransactionStatus | 'All Statuses' =
-    TRANSACTION_STATUS.find((value) => value === rawStatus) ?? 'All Statuses'
+  const type: TransactionType =
+    TRANSACTION_TYPE.find((value) => value === rawType) ?? 'all_types'
+  const status: TransactionStatus =
+    TRANSACTION_STATUS.find((value) => value === rawStatus) ?? 'all_statuses'
 
   const [searchInput, setSearchInput] = useState(searchParam)
   const lastWrittenSearch = useRef(searchParam)
@@ -55,10 +55,11 @@ function TransactionsContent() {
       lastWrittenSearch.current = searchInput
       const params = new URLSearchParams(searchParams.toString())
       if (searchInput) {
-        params.set('search', searchInput)
+        params.set('q', searchInput)
       } else {
-        params.delete('search')
+        params.delete('q')
       }
+      params.delete('page')
       const query = params.toString()
       router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
     }, 300)
@@ -73,11 +74,12 @@ function TransactionsContent() {
   const handleTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = event.target
     const params = new URLSearchParams(searchParams.toString())
-    if (value === 'All Types') {
+    if (value === 'all_types') {
       params.delete('type')
     } else {
       params.set('type', value)
     }
+    params.delete('page')
     const query = params.toString()
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
   }
@@ -85,11 +87,12 @@ function TransactionsContent() {
   const handleStatusChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = event.target
     const params = new URLSearchParams(searchParams.toString())
-    if (value === 'All Statuses') {
+    if (value === 'all_statuses') {
       params.delete('status')
     } else {
       params.set('status', value)
     }
+    params.delete('page')
     const query = params.toString()
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
   }
