@@ -4,7 +4,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import type { Transaction } from '@/types/api'
 import { TRANSACTION_STATUS, TRANSACTION_TYPE } from '@/types/api'
 import type { TransactionQuery } from '@/lib/api/endpoints'
-import { Pagination, Card, Drawer, Money } from '@/components/ui'
+import { Pagination, Card, Drawer, Money, TransactionsLoading } from '@/components/ui'
 import { TransactionRow } from '@/components/transactions'
 import { useTransactionsStore } from '@/store/transactionsStore'
 import { formatDateTime, TRANSACTION_STATUS_LABELS } from '@/lib/format'
@@ -76,6 +76,7 @@ export function AllTransactions() {
       ...(status && status !== 'all_statuses' ? { status } : {}),
     }
 
+    window.scrollTo({ top: 0, behavior: 'smooth' })
     void fetchTransactions(query)
   }, [fetchTransactions, page, limit, queryText, type, status])
 
@@ -92,38 +93,40 @@ export function AllTransactions() {
 
   return (
     <>
-      <Card padding="none" className={styles.card}>
-        {transactionsLoading ? (
-          <p className={styles.message}>Loading transactions…</p>
-        ) : transactionGroups.length ? (
-          transactionGroups.map((group) => (
-            <section className={styles.group} key={group.key}>
-              <h2 className={styles.groupHeading}>{group.label}</h2>
-              {group.transactions.map((tx) => (
-                <TransactionRow key={tx.id} transaction={tx} onSelect={setSelected} />
-              ))}
-            </section>
-          ))
-        ) : (
-          <p className={styles.message}>No transactions found.</p>
-        )}
-        <Drawer open={selected !== null} title="Transaction details" onClose={() => setSelected(null)}>
-          {selected && (
-            <dl className={styles.details}>
-              <dt>Reference</dt>
-              <dd>{selected.reference}</dd>
-              <dt>Amount</dt>
-              <dd>
-                <Money amount={selected.amount} currency={selected.currency} />
-              </dd>
-              <dt>Status</dt>
-              <dd>{TRANSACTION_STATUS_LABELS[selected.status]}</dd>
-              <dt>Date</dt>
-              <dd>{formatDateTime(selected.createdAt)}</dd>
-            </dl>
+      {transactionsLoading ? (
+        <TransactionsLoading />
+      ) : (
+        <Card padding="none" className={styles.card}>
+          {transactionGroups.length ? (
+            transactionGroups.map((group) => (
+              <section className={styles.group} key={group.key}>
+                <h2 className={styles.groupHeading}>{group.label}</h2>
+                {group.transactions.map((tx) => (
+                  <TransactionRow key={tx.id} transaction={tx} onSelect={setSelected} />
+                ))}
+              </section>
+            ))
+          ) : (
+            <p className={styles.message}>No transactions found.</p>
           )}
-        </Drawer>
-      </Card>
+        </Card>
+      )}
+      <Drawer open={selected !== null} title="Transaction details" onClose={() => setSelected(null)}>
+        {selected && (
+          <dl className={styles.details}>
+            <dt>Reference</dt>
+            <dd>{selected.reference}</dd>
+            <dt>Amount</dt>
+            <dd>
+              <Money amount={selected.amount} currency={selected.currency} />
+            </dd>
+            <dt>Status</dt>
+            <dd>{TRANSACTION_STATUS_LABELS[selected.status]}</dd>
+            <dt>Date</dt>
+            <dd>{formatDateTime(selected.createdAt)}</dd>
+          </dl>
+        )}
+      </Drawer>
       <Pagination
         pagination={transactionsMeta}
         onPageChange={setPage}
