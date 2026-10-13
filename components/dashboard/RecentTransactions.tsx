@@ -2,22 +2,23 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import type { Transaction } from '@/types/api'
-import { Card, CardHeader, Drawer, Money } from '@/components/ui'
+import { Card, CardHeader, Drawer, Money, TransactionsLoading } from '@/components/ui'
 import { TransactionRow } from '@/components/transactions'
-import { getTransactions } from '@/lib/api/endpoints'
+import { useTransactionsStore } from '@/store/transactionsStore'
+import type { TransactionQuery } from '@/lib/api/endpoints'
 import { formatDateTime, TRANSACTION_STATUS_LABELS } from '@/lib/format'
 import styles from './RecentTransactions.module.css'
 
 export function RecentTransactions() {
   const [selected, setSelected] = useState<Transaction | null>(null)
-  const [transactions, setTransactions] = useState<Transaction[]>()
-  const [isLoading, setIsLoading] = useState(true)
+  const { transactions, transactionsLoading, fetchTransactions } = useTransactionsStore()
 
   useEffect(() => {
-    getTransactions({ limit: 5 })
-      .then((res) => setTransactions(res.data))
-      .finally(() => setIsLoading(false))
-  }, [])
+    const query: TransactionQuery = {
+      limit:5,
+    }
+    void fetchTransactions(query)
+  }, [fetchTransactions])
 
   return (
     <Card padding="none">
@@ -31,8 +32,10 @@ export function RecentTransactions() {
           }
         />
       </div>
-      {isLoading && <p className={styles.message}>Loading…</p>}
-      {!isLoading && !transactions?.length && <p className={styles.message}>No transactions yet.</p>}
+      {transactionsLoading && <TransactionsLoading count={5} />}
+      {!transactionsLoading && !transactions?.length && (
+        <p className={styles.message}>No transactions yet.</p>
+      )}
       {transactions?.map((tx) => (
         <TransactionRow key={tx.id} transaction={tx} onSelect={setSelected} />
       ))}
