@@ -1,14 +1,35 @@
 // Domain types for the Acme API. Keep in sync with API.md.
 
-export type Currency = 'NGN' | 'USD' | 'GHS'
-
 export const CURRENCIES: readonly Currency[] = ['NGN', 'USD', 'GHS']
+export const TRANSACTION_TYPE: readonly TransactionType[] = [
+  'all_types',
+  'withdrawal',
+  'transfer_in',
+  'transfer_out',
+  'conversion',
+  'card_payment',
+  'bill_payment',
+]
+export const TRANSACTION_STATUS: readonly TransactionStatus[] = [
+  'all_statuses',
+  'successful',
+  'pending',
+  'failed',
+  'reversed',
+]
 
+export type Currency = 'NGN' | 'USD' | 'GHS'
 export type TransactionType =
-  'deposit' | 'withdrawal' | 'transfer_in' | 'transfer_out' | 'conversion' | 'card_payment' | 'bill_payment'
+  | 'all_types'
+  | 'deposit'
+  | 'withdrawal'
+  | 'transfer_in'
+  | 'transfer_out'
+  | 'conversion'
+  | 'card_payment'
+  | 'bill_payment'
 
-export type TransactionStatus = 'successful' | 'pending' | 'failed'
-
+export type TransactionStatus = 'all_statuses' | 'successful' | 'pending' | 'failed' | 'reversed'
 export interface Transaction {
   id: string
   reference: string
