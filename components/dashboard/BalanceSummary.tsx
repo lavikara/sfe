@@ -17,10 +17,11 @@ export function BalanceSummary({ wallets }: { wallets: Wallet[] | null }) {
       <Button
         variant="ghost"
         size="sm"
+        className={styles.toggleButton}
         iconLeft={hidden ? 'eye' : 'eye-off'}
         onClick={() => setHidden(!hidden)}
       >
-        {hidden ? 'Show' : 'Hide'}
+        <span className={styles.toggleLabel}>{hidden ? 'Show' : 'Hide'}</span>
       </Button>
     </Card>
   )
