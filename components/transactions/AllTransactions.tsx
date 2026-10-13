@@ -4,10 +4,9 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import type { Transaction } from '@/types/api'
 import { TRANSACTION_STATUS, TRANSACTION_TYPE } from '@/types/api'
 import type { TransactionQuery } from '@/lib/api/endpoints'
-import { Pagination, Card, Drawer, Money, TransactionsLoading } from '@/components/ui'
-import { TransactionRow } from '@/components/transactions'
+import { Pagination, Card, Drawer, TransactionsLoading } from '@/components/ui'
+import { TransactionDetails, TransactionRow } from '@/components/transactions'
 import { useTransactionsStore } from '@/store/transactionsStore'
-import { formatDateTime, TRANSACTION_STATUS_LABELS } from '@/lib/format'
 import styles from './AllTransactions.module.css'
 
 function getDateKey(date: Date) {
@@ -112,20 +111,7 @@ export function AllTransactions() {
         </Card>
       )}
       <Drawer open={selected !== null} title="Transaction details" onClose={() => setSelected(null)}>
-        {selected && (
-          <dl className={styles.details}>
-            <dt>Reference</dt>
-            <dd>{selected.reference}</dd>
-            <dt>Amount</dt>
-            <dd>
-              <Money amount={selected.amount} currency={selected.currency} />
-            </dd>
-            <dt>Status</dt>
-            <dd>{TRANSACTION_STATUS_LABELS[selected.status]}</dd>
-            <dt>Date</dt>
-            <dd>{formatDateTime(selected.createdAt)}</dd>
-          </dl>
-        )}
+        {selected && <TransactionDetails transaction={selected} />}
       </Drawer>
       <Pagination
         pagination={transactionsMeta}
