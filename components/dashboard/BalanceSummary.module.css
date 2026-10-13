@@ -16,3 +16,15 @@
   font-weight: var(--weight-heavy);
   letter-spacing: -0.02em;
 }
+
+
+
+@media (max-width: 640px) {
+  .toggleLabel {
+    display: none;
+  }
+
+  .toggleButton {
+  margin-bottom: var(--space-12);
+}
+}
