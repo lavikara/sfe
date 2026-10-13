@@ -1,5 +1,5 @@
 'use client'
-import { Suspense, useEffect, useRef, useState } from 'react'
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { AllTransactions } from '@/components/transactions'
 import { Input, Select } from '@/components/ui'
@@ -41,6 +41,21 @@ function TransactionsContent() {
   const { userLoading } = useUserStore()
   const { transactionsMeta } = useTransactionsStore()
 
+  const updateParam = useCallback(
+    (key: 'q' | 'type' | 'status', value: string) => {
+      const params = new URLSearchParams(searchParams.toString())
+      if (value) {
+        params.set(key, value)
+      } else {
+        params.delete(key)
+      }
+      params.delete('page')
+      const query = params.toString()
+      router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
+    },
+    [pathname, router, searchParams],
+  )
+
   useEffect(() => {
     if (searchParam !== lastWrittenSearch.current) {
       lastWrittenSearch.current = searchParam
@@ -53,19 +68,11 @@ function TransactionsContent() {
 
     const timeout = setTimeout(() => {
       lastWrittenSearch.current = searchInput
-      const params = new URLSearchParams(searchParams.toString())
-      if (searchInput) {
-        params.set('q', searchInput)
-      } else {
-        params.delete('q')
-      }
-      params.delete('page')
-      const query = params.toString()
-      router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
-    }, 300)
+      updateParam('q', searchInput)
+    }, 1000)
 
     return () => clearTimeout(timeout)
-  }, [searchInput, searchParam, searchParams, pathname, router])
+  }, [searchInput, searchParam, updateParam])
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInput(event.target.value)
@@ -73,28 +80,12 @@ function TransactionsContent() {
 
   const handleTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = event.target
-    const params = new URLSearchParams(searchParams.toString())
-    if (value === 'all_types') {
-      params.delete('type')
-    } else {
-      params.set('type', value)
-    }
-    params.delete('page')
-    const query = params.toString()
-    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
+    updateParam('type', value === 'all_types' ? '' : value)
   }
 
   const handleStatusChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = event.target
-    const params = new URLSearchParams(searchParams.toString())
-    if (value === 'all_statuses') {
-      params.delete('status')
-    } else {
-      params.set('status', value)
-    }
-    params.delete('page')
-    const query = params.toString()
-    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
+    updateParam('status', value === 'all_statuses' ? '' : value)
   }
 
   if (userLoading) return <p className={styles.loading}>Loading…</p>
@@ -103,7 +94,7 @@ function TransactionsContent() {
     <div className={styles.page}>
       <header>
         <h1 className={styles.title}>Transactions</h1>
-        <p className={styles.subtitle}>{transactionsMeta?.total || 0} transactions</p>
+        <p className={styles.subtitle}>{transactionsMeta?.total ?? 0} transactions</p>
       </header>
 
       <div className={styles.row}>
