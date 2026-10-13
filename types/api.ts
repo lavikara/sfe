@@ -3,6 +3,7 @@
 export const CURRENCIES: readonly Currency[] = ['NGN', 'USD', 'GHS']
 export const TRANSACTION_TYPE: readonly TransactionType[] = [
   'all_types',
+  'deposit',
   'withdrawal',
   'transfer_in',
   'transfer_out',
