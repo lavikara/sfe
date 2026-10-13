@@ -35,4 +35,18 @@ describe('Pagination', () => {
 
     expect(onPageChange.mock.calls).toEqual([[11], [10]])
   })
+
+  it('shows a valid first page for an empty result set', () => {
+    render(
+      <Pagination
+        pagination={{ page: 1, limit: 20, total: 0, totalPages: 0 }}
+        onPageChange={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('Showing 0–0 of 0')).toBeInTheDocument()
+    expect(screen.getByText('Page 1 of 1')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /previous/i })).toBeDisabled()
+    expect(screen.getByRole('button', { name: /next/i })).toBeDisabled()
+  })
 })
