@@ -1,29 +1,38 @@
 import { create } from 'zustand'
-import type { Transaction,PageMeta } from '@/types/api'
-import { getTransactions } from '@/lib/api/endpoints'
+import type { Transaction, PageMeta } from '@/types/api'
+import { getTransactions, type TransactionQuery } from '@/lib/api/endpoints'
 
 interface TransactionState {
   transactions: Transaction[] | null
   transactionsMeta: PageMeta | null
   transactionsLoading: boolean
-  fetchTransactions: () => Promise<void>
+  fetchTransactions: (query?: TransactionQuery) => Promise<void>
 }
 
-export const useTransactionsStore = create<TransactionState>((set) => ({
-  transactions: null,
-  transactionsMeta:null,
-  transactionsLoading: true,
-    
-  fetchTransactions: async () => {
-    set({ transactionsLoading: true })
-    try {
-      const response = await getTransactions()
-      set({ transactions: response.data })
-      set({ transactionsMeta: response.meta })
-      set({ transactionsLoading: false })
-    } catch (err) {
-      console.error('Error fetching transactions:', err)
-      set({ transactionsLoading: false })
-    }
-  },
-}))
+export const useTransactionsStore = create<TransactionState>((set) => {
+  let latestRequest = 0
+
+  return {
+    transactions: null,
+    transactionsMeta: null,
+    transactionsLoading: true,
+
+    fetchTransactions: async (query = {}) => {
+      const requestId = ++latestRequest
+      set({ transactionsLoading: true })
+      try {
+        const response = await getTransactions(query)
+        if (requestId !== latestRequest) return
+
+        set({
+          transactions: response.data,
+          transactionsMeta: response.meta ?? null,
+          transactionsLoading: false,
+        })
+      } catch (err) {
+        console.error('Error fetching transactions:', err)
+        if (requestId === latestRequest) set({ transactionsLoading: false })
+      }
+    },
+  }
+})
