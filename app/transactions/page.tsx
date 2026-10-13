@@ -1,5 +1,6 @@
 'use client'
-import { useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { TransactionRow, StatusDot } from '@/components/transactions'
 import { Button, Card, Input, Drawer, Select } from '@/components/ui'
 import type { TransactionType, TransactionStatus } from '@/types/api'
@@ -20,26 +21,75 @@ const TRANSACTION_STATUS_OPTIONS = TRANSACTION_STATUS.map((value) => ({
   label: formatOptionLabel(value),
 }))
 
-export default function TransactionsPage() {
-  const [type, setType] = useState<TransactionType | 'All Types'>('All Types')
-  const [status, setStatus] = useState<TransactionStatus | 'All Statuses'>('All Statuses')
-  const [search, setSearch] = useState('')
+function TransactionsContent() {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  const searchParam = searchParams.get('search') ?? ''
+  const rawType = searchParams.get('type')
+  const rawStatus = searchParams.get('status')
+  const type: TransactionType | 'All Types' =
+    TRANSACTION_TYPE.find((value) => value === rawType) ?? 'All Types'
+  const status: TransactionStatus | 'All Statuses' =
+    TRANSACTION_STATUS.find((value) => value === rawStatus) ?? 'All Statuses'
+
+  const [searchInput, setSearchInput] = useState(searchParam)
+  const lastWrittenSearch = useRef(searchParam)
 
   const { user, userLoading } = useUserStore()
 
-    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement >) => {
-    const { value } = event.target
-    setSearch(value )
+  useEffect(() => {
+    if (searchParam !== lastWrittenSearch.current) {
+      lastWrittenSearch.current = searchParam
+      setSearchInput(searchParam)
+    }
+  }, [searchParam])
+
+  useEffect(() => {
+    if (searchInput === searchParam) return
+
+    const timeout = setTimeout(() => {
+      lastWrittenSearch.current = searchInput
+      const params = new URLSearchParams(searchParams.toString())
+      if (searchInput) {
+        params.set('search', searchInput)
+      } else {
+        params.delete('search')
+      }
+      const query = params.toString()
+      router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
+    }, 300)
+
+    return () => clearTimeout(timeout)
+  }, [searchInput, searchParam, searchParams, pathname, router])
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchInput(event.target.value)
   }
 
-  const handleTypeChange = (event: React.ChangeEvent< HTMLSelectElement>) => {
+  const handleTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = event.target
-    setType(value as TransactionType)
+    const params = new URLSearchParams(searchParams.toString())
+    if (value === 'All Types') {
+      params.delete('type')
+    } else {
+      params.set('type', value)
+    }
+    const query = params.toString()
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
   }
 
-  const handleStatusChange = (event: React.ChangeEvent< HTMLSelectElement>) => {
+  const handleStatusChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = event.target
-    setStatus(value as TransactionStatus)
+    const params = new URLSearchParams(searchParams.toString())
+    if (value === 'All Statuses') {
+      params.delete('status')
+    } else {
+      params.set('status', value)
+    }
+    const query = params.toString()
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
   }
 
   if (userLoading) return <p className={styles.loading}>Loading…</p>
@@ -57,7 +107,7 @@ export default function TransactionsPage() {
           type="text"
           leadingIcon="search"
           placeholder="Search by reference, name or narration"
-          value={search}
+          value={searchInput}
           onChange={handleSearchChange}
           fieldClassName={styles.search}
         />
@@ -80,5 +130,13 @@ export default function TransactionsPage() {
         <div></div>
       </Card>
     </div>
+  )
+}
+
+export default function TransactionsPage() {
+  return (
+    <Suspense fallback={<p className={styles.loading}>Loading…</p>}>
+      <TransactionsContent />
+    </Suspense>
   )
 }
