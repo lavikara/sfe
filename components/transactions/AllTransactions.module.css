@@ -24,22 +24,6 @@
   text-align: center;
 }
 
-.details {
-  display: grid;
-  grid-template-columns: minmax(90px, auto) minmax(0, 1fr);
-  gap: var(--space-3) var(--space-4);
-}
-
-.details dt {
-  color: var(--color-text-muted);
-}
-
-.details dd {
-  min-width: 0;
-  overflow-wrap: anywhere;
-  font-weight: var(--weight-medium);
-}
-
 @media (max-width: 640px) {
 
 
