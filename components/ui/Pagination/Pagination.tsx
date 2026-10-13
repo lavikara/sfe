@@ -20,10 +20,10 @@ export function Pagination({
     return null;
   }
   const { total, limit } = pagination;
-  const totalPages = Math.ceil(total / limit);
+  const totalPages = Math.max(1, Math.ceil(total / limit));
   const safePage = Math.min(Math.max(pagination.page, 1), totalPages);
 
-  const firstItem = (safePage - 1) * limit + 1;
+  const firstItem = total === 0 ? 0 : (safePage - 1) * limit + 1;
   const lastItem = Math.min(safePage * limit, total);
 
   const isFirstPage = safePage === 1;
