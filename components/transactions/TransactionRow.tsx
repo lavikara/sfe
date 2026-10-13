@@ -1,6 +1,6 @@
 import type { Transaction, TransactionType } from '@/types/api'
 import { Icon, type IconName, Money } from '@/components/ui'
-import { formatDateTime, TRANSACTION_TYPE_LABELS } from '@/lib/format'
+import { formatTime,getInitials, TRANSACTION_TYPE_LABELS } from '@/lib/format'
 import { StatusDot } from './StatusDot'
 import styles from './TransactionRow.module.css'
 
@@ -24,17 +24,27 @@ export interface TransactionRowProps {
 
 export function TransactionRow({ transaction: tx, onSelect }: TransactionRowProps) {
   const isCredit = CREDIT_TYPES.includes(tx.type)
+  const counterpartyInitials =
+    (tx.type === 'transfer_in' || tx.type === 'transfer_out') && tx.counterparty
+      ? getInitials(tx.counterparty)
+      : null
 
   return (
     <button type="button" className={styles.row} onClick={() => onSelect?.(tx)}>
       <span className={styles.icon}>
-        <Icon name={TYPE_ICONS[tx.type]} size={18} />
+        {counterpartyInitials ? (
+          <span className={styles.initials}>{counterpartyInitials}</span>
+        ) : (
+          <Icon name={TYPE_ICONS[tx.type]} size={18} />
+        )}
       </span>
       <span className={styles.main}>
         <span className={styles.title}>{TRANSACTION_TYPE_LABELS[tx.type]}</span>
         <span className={styles.narration}>{tx.narration}</span>
       </span>
-      <StatusDot status={tx.status} />
+      <span className={styles.status}>
+        <StatusDot status={tx.status} />
+      </span>
       <span className={styles.end}>
         <Money
           amount={tx.amount}
@@ -42,10 +52,7 @@ export function TransactionRow({ transaction: tx, onSelect }: TransactionRowProp
           sign={isCredit ? 'credit' : 'debit'}
           className={isCredit ? styles.credit : styles.amount}
         />
-        <span className={styles.meta}>
-          {formatDateTime(tx.createdAt)}
-          {tx.fee > 0 && ` · Fee ₦${tx.fee}`}
-        </span>
+        <span className={styles.meta}>{formatTime(tx.createdAt)}</span>
       </span>
     </button>
   )
