@@ -64,6 +64,7 @@
 }
 
 .row {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(72px, 0.7fr) minmax(0, 1.3fr);
   align-items: start;
@@ -116,11 +117,22 @@
 }
 
 .copyMessage {
+  position: absolute;
+  right: 0;
+  top: -2rem;
   min-height: 16px;
   margin-top: var(--space-1);
   color: var(--color-text-muted);
   font-size: var(--text-xs);
   text-align: right;
+}
+
+.copyMessageSuccess {
+  color: var(--color-success);
+}
+
+.copyMessageError {
+  color: var(--color-danger);
 }
 
 .financialSection {
