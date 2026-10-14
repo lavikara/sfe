@@ -4,7 +4,7 @@ import { getTransactions, type TransactionQuery } from '@/lib/api/endpoints'
 
 interface TransactionState {
   transactions: Transaction[] | null
-  transactionsMeta: PageMeta | null
+  transactionsMeta: PageMeta
   transactionsLoading: boolean
   fetchTransactions: (query?: TransactionQuery) => Promise<void>
 }
@@ -14,7 +14,7 @@ export const useTransactionsStore = create<TransactionState>((set) => {
 
   return {
     transactions: null,
-    transactionsMeta: null,
+    transactionsMeta: { page: 1, limit: 20, total: 0,totalPages: 0 },
     transactionsLoading: true,
 
     fetchTransactions: async (query = {}) => {
@@ -26,7 +26,7 @@ export const useTransactionsStore = create<TransactionState>((set) => {
 
         set({
           transactions: response.data,
-          transactionsMeta: response.meta ?? null,
+          transactionsMeta: response.meta,
           transactionsLoading: false,
         })
       } catch (err) {
