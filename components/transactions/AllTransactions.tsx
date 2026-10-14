@@ -10,6 +10,7 @@ import {
   Drawer,
   NoTransactionsMatch,
   NoTransactionsYet,
+  TransactionsLoadError,
   TransactionsLoading,
 } from '@/components/ui'
 import { TransactionDetails, TransactionRow } from '@/components/transactions'
@@ -56,6 +57,22 @@ function groupTransactionsByDate(transactions: Transaction[]) {
   return [...groups.entries()].map(([key, group]) => ({ key, ...group }))
 }
 
+function getTransactionsQuery(
+  page: number,
+  limit: number,
+  queryText: string,
+  type: (typeof TRANSACTION_TYPE)[number] | undefined,
+  status: (typeof TRANSACTION_STATUS)[number] | undefined,
+): TransactionQuery {
+  return {
+    page,
+    limit,
+    ...(queryText ? { q: queryText } : {}),
+    ...(type && type !== 'all_types' ? { type } : {}),
+    ...(status && status !== 'all_statuses' ? { status } : {}),
+  }
+}
+
 export function AllTransactions() {
   const [selected, setSelected] = useState<Transaction | null>(null)
   const router = useRouter()
@@ -69,7 +86,13 @@ export function AllTransactions() {
   const type = TRANSACTION_TYPE.find((value) => value === searchParams.get('type'))
   const status = TRANSACTION_STATUS.find((value) => value === searchParams.get('status'))
 
-  const { transactions, transactionsLoading, transactionsMeta, fetchTransactions } = useTransactionsStore()
+  const {
+    transactions,
+    transactionsLoading,
+    transactionsError,
+    transactionsMeta,
+    fetchTransactions,
+  } = useTransactionsStore()
 
   const transactionGroups = groupTransactionsByDate(transactions ?? [])
   const hasActiveFilters = Boolean(
@@ -79,16 +102,8 @@ export function AllTransactions() {
   )
 
   useEffect(() => {
-    const query: TransactionQuery = {
-      page,
-      limit,
-      ...(queryText ? { q: queryText } : {}),
-      ...(type && type !== 'all_types' ? { type } : {}),
-      ...(status && status !== 'all_statuses' ? { status } : {}),
-    }
-
     window.scrollTo({ top: 0, behavior: 'smooth' })
-    void fetchTransactions(query)
+    void fetchTransactions(getTransactionsQuery(page, limit, queryText, type, status))
   }, [fetchTransactions, page, limit, queryText, type, status])
 
   const setPage = (nextPage: number) => {
@@ -112,10 +127,16 @@ export function AllTransactions() {
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
   }
 
+  const retryFetch = () => {
+    void fetchTransactions(getTransactionsQuery(page, limit, queryText, type, status))
+  }
+
   return (
     <>
       {transactionsLoading ? (
         <TransactionsLoading />
+      ) : transactionsError ? (
+        <TransactionsLoadError onRetry={retryFetch} />
       ) : transactionGroups.length ? (
         <Card padding="none" className={styles.card}>
           {transactionGroups.map((group) => (
