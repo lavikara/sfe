@@ -64,10 +64,12 @@ function getTransactionsQuery(
   type: (typeof TRANSACTION_TYPE)[number] | undefined,
   status: (typeof TRANSACTION_STATUS)[number] | undefined,
 ): TransactionQuery {
+  const normalizedQueryText = queryText.trim()
+
   return {
     page,
     limit,
-    ...(queryText ? { q: queryText } : {}),
+    ...(normalizedQueryText ? { q: normalizedQueryText } : {}),
     ...(type && type !== 'all_types' ? { type } : {}),
     ...(status && status !== 'all_statuses' ? { status } : {}),
   }
@@ -83,6 +85,7 @@ export function AllTransactions() {
   const rawLimit = Number(searchParams.get('limit') ?? 20)
   const limit = Number.isInteger(rawLimit) && rawLimit > 0 ? rawLimit : 20
   const queryText = searchParams.get('q') ?? ''
+  const normalizedQueryText = queryText.trim()
   const type = TRANSACTION_TYPE.find((value) => value === searchParams.get('type'))
   const status = TRANSACTION_STATUS.find((value) => value === searchParams.get('status'))
 
@@ -96,15 +99,15 @@ export function AllTransactions() {
 
   const transactionGroups = groupTransactionsByDate(transactions ?? [])
   const hasActiveFilters = Boolean(
-    queryText ||
+    normalizedQueryText ||
     (type && type !== 'all_types') ||
     (status && status !== 'all_statuses'),
   )
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
-    void fetchTransactions(getTransactionsQuery(page, limit, queryText, type, status))
-  }, [fetchTransactions, page, limit, queryText, type, status])
+    void fetchTransactions(getTransactionsQuery(page, limit, normalizedQueryText, type, status))
+  }, [fetchTransactions, page, limit, normalizedQueryText, type, status])
 
   const setPage = (nextPage: number) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -128,7 +131,7 @@ export function AllTransactions() {
   }
 
   const retryFetch = () => {
-    void fetchTransactions(getTransactionsQuery(page, limit, queryText, type, status))
+    void fetchTransactions(getTransactionsQuery(page, limit, normalizedQueryText, type, status))
   }
 
   return (

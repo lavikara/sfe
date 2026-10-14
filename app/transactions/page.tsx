@@ -65,8 +65,10 @@ function TransactionsContent() {
     if (searchInput === searchParam) return
 
     const timeout = setTimeout(() => {
-      lastWrittenSearch.current = searchInput
-      updateParam('q', searchInput)
+      const normalizedSearch = searchInput.trim()
+      lastWrittenSearch.current = normalizedSearch
+      setSearchInput(normalizedSearch)
+      updateParam('q', normalizedSearch)
     }, 1000)
 
     return () => clearTimeout(timeout)
