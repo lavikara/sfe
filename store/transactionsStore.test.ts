@@ -10,8 +10,9 @@ describe('transactions store', () => {
   beforeEach(() => {
     useTransactionsStore.setState({
       transactions: null,
-      transactionsMeta: null,
+      transactionsMeta: { page: 1, limit: 20, total: 0, totalPages: 0 },
       transactionsLoading: true,
+      transactionsError: false,
     })
     vi.mocked(getTransactions).mockResolvedValue({
       data: [],
@@ -31,6 +32,23 @@ describe('transactions store', () => {
     await useTransactionsStore.getState().fetchTransactions(query)
 
     expect(getTransactions).toHaveBeenCalledWith(query)
+  })
+
+  it('sets an error state on failure and clears it after a successful retry', async () => {
+    const error = new Error('Service unavailable')
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+    vi.mocked(getTransactions).mockRejectedValueOnce(error)
+
+    await useTransactionsStore.getState().fetchTransactions({ limit: 5 })
+
+    expect(useTransactionsStore.getState().transactionsLoading).toBe(false)
+    expect(useTransactionsStore.getState().transactionsError).toBe(true)
+    expect(consoleError).toHaveBeenCalledWith('Error fetching transactions:', error)
+
+    await useTransactionsStore.getState().fetchTransactions({ limit: 5 })
+
+    expect(useTransactionsStore.getState().transactionsError).toBe(false)
+    consoleError.mockRestore()
   })
 
   it('does not let an older query response replace newer results', async () => {
