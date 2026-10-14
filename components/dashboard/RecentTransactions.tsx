@@ -2,22 +2,29 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import type { Transaction } from '@/types/api'
-import { Card, CardHeader, Drawer, NoTransactionsYet, TransactionsLoading } from '@/components/ui'
+import {
+  Card,
+  CardHeader,
+  Drawer,
+  NoTransactionsYet,
+  TransactionsLoadError,
+  TransactionsLoading,
+} from '@/components/ui'
 import { TransactionDetails, TransactionRow } from '@/components/transactions'
 import { useTransactionsStore } from '@/store/transactionsStore'
-import type { TransactionQuery } from '@/lib/api/endpoints'
 import styles from './RecentTransactions.module.css'
 
 export function RecentTransactions() {
   const [selected, setSelected] = useState<Transaction | null>(null)
-  const { transactions, transactionsLoading, fetchTransactions } = useTransactionsStore()
+  const { transactions, transactionsLoading, transactionsError, fetchTransactions } = useTransactionsStore()
 
   useEffect(() => {
-    const query: TransactionQuery = {
-      limit:5,
-    }
-    void fetchTransactions(query)
+    void fetchTransactions({ limit: 5 })
   }, [fetchTransactions])
+
+  const retryFetch = () => {
+    void fetchTransactions({ limit: 5 })
+  }
 
   return (
     <Card padding="none">
@@ -31,11 +38,17 @@ export function RecentTransactions() {
           }
         />
       </div>
-      {transactionsLoading && <TransactionsLoading count={5} />}
-      {!transactionsLoading && !transactions?.length && <NoTransactionsYet />}
-      {transactions?.map((tx) => (
-        <TransactionRow key={tx.id} transaction={tx} onSelect={setSelected} />
-      ))}
+      {transactionsLoading ? (
+        <TransactionsLoading count={5} />
+      ) : transactionsError ? (
+        <TransactionsLoadError onRetry={retryFetch} />
+      ) : !transactions?.length ? (
+        <NoTransactionsYet />
+      ) : (
+        transactions.map((tx) => (
+          <TransactionRow key={tx.id} transaction={tx} onSelect={setSelected} />
+        ))
+      )}
       <Drawer open={selected !== null} title="Transaction details" onClose={() => setSelected(null)}>
         {selected && <TransactionDetails transaction={selected} />}
       </Drawer>
