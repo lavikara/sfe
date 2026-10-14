@@ -4,7 +4,14 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import type { Transaction } from '@/types/api'
 import { TRANSACTION_STATUS, TRANSACTION_TYPE } from '@/types/api'
 import type { TransactionQuery } from '@/lib/api/endpoints'
-import { Pagination, Card, Drawer, NoTransactionsMatch, TransactionsLoading } from '@/components/ui'
+import {
+  Pagination,
+  Card,
+  Drawer,
+  NoTransactionsMatch,
+  NoTransactionsYet,
+  TransactionsLoading,
+} from '@/components/ui'
 import { TransactionDetails, TransactionRow } from '@/components/transactions'
 import { useTransactionsStore } from '@/store/transactionsStore'
 import styles from './AllTransactions.module.css'
@@ -66,7 +73,7 @@ export function AllTransactions() {
 
   const transactionGroups = groupTransactionsByDate(transactions ?? [])
   const hasActiveFilters = Boolean(
-    queryText.trim() ||
+    queryText ||
     (type && type !== 'all_types') ||
     (status && status !== 'all_statuses'),
   )
@@ -123,9 +130,7 @@ export function AllTransactions() {
       ) : hasActiveFilters ? (
         <NoTransactionsMatch onClearFilters={clearFilters} />
       ) : (
-        <Card padding="none" className={styles.card}>
-          <p className={styles.message}>No transactions found.</p>
-        </Card>
+        <NoTransactionsYet />
       )}
       <Drawer open={selected !== null} title="Transaction details" onClose={() => setSelected(null)}>
         {selected && <TransactionDetails transaction={selected} />}
