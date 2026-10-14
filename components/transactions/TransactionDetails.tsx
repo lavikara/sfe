@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { Transaction, TransactionType } from '@/types/api'
 import { formatMoney, getInitials, TRANSACTION_TYPE_LABELS } from '@/lib/format'
 import { Icon, Money } from '@/components/ui'
@@ -18,8 +18,35 @@ const dateTimeFormatter = new Intl.DateTimeFormat('en-GB', {
   minute: '2-digit',
 })
 
+async function copyText(text: string) {
+  if (navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(text)
+      return
+    } catch {}
+  }
+
+  const textarea = document.createElement('textarea')
+  textarea.value = text
+  textarea.setAttribute('readonly', '')
+  textarea.style.position = 'fixed'
+  textarea.style.opacity = '0'
+  document.body.appendChild(textarea)
+
+  try {
+    textarea.focus()
+    textarea.select()
+    textarea.setSelectionRange(0, textarea.value.length)
+    if (!document.execCommand('copy')) {
+      throw new Error('The browser could not copy the transaction reference.')
+    }
+  } finally {
+    textarea.remove()
+  }
+}
+
 export function TransactionDetails({ transaction }: { transaction: Transaction }) {
-  const [copyMessage, setCopyMessage] = useState('')
+  const [copyMessage, setCopyMessage] = useState<{ text: string; status: 'success' | 'error' } | null>(null)
   const isCredit = CREDIT_TYPES.includes(transaction.type)
   const sign = isCredit ? 'credit' : 'debit'
   const initials = transaction.counterparty
@@ -28,17 +55,26 @@ export function TransactionDetails({ transaction }: { transaction: Transaction }
 
   const copyReference = async () => {
     try {
-      await navigator.clipboard.writeText(transaction.reference)
-      setCopyMessage('Reference copied')
+      await copyText(transaction.reference)
+      setCopyMessage({ text: 'Reference copied', status: 'success' })
     } catch {
-      setCopyMessage('Unable to copy reference')
+      setCopyMessage({ text: 'Unable to copy reference', status: 'error' })
     }
   }
+
+  useEffect(() => {
+    if (!copyMessage) return
+
+    const timeout = window.setTimeout(() => setCopyMessage(null), 3000)
+    return () => window.clearTimeout(timeout)
+  }, [copyMessage])
 
   return (
     <div className={styles.details}>
       <section className={styles.summary} aria-label="Transaction summary">
-        <span className={styles.avatar} aria-hidden="true">{initials}</span>
+        <span className={styles.avatar} aria-hidden="true">
+          {initials}
+        </span>
         <p className={styles.description}>{transaction.narration}</p>
         <p className={styles.heroAmount}>
           <Money amount={transaction.amount} currency={transaction.currency} sign={sign} />
@@ -47,9 +83,23 @@ export function TransactionDetails({ transaction }: { transaction: Transaction }
       </section>
 
       <section className={styles.section} aria-labelledby="transaction-details-heading">
-        <h3 id="transaction-details-heading" className={styles.sectionTitle}>Details</h3>
+        <h3 id="transaction-details-heading" className={styles.sectionTitle}>
+          Details
+        </h3>
         <dl className={styles.rows}>
           <div className={styles.row}>
+            <p
+              className={[
+                styles.copyMessage,
+                copyMessage?.status === 'success' && styles.copyMessageSuccess,
+                copyMessage?.status === 'error' && styles.copyMessageError,
+              ]
+                .filter(Boolean)
+                .join(' ')}
+              aria-live="polite"
+            >
+              {copyMessage?.text}
+            </p>
             <dt>Reference</dt>
             <dd className={styles.reference}>
               <span>{transaction.reference}</span>
@@ -80,11 +130,15 @@ export function TransactionDetails({ transaction }: { transaction: Transaction }
             <dd>{transaction.narration}</dd>
           </div>
         </dl>
-        <p className={styles.copyMessage} aria-live="polite">{copyMessage}</p>
       </section>
 
-      <section className={`${styles.section} ${styles.financialSection}`} aria-labelledby="transaction-summary-heading">
-        <h3 id="transaction-summary-heading" className={styles.sectionTitle}>Summary</h3>
+      <section
+        className={`${styles.section} ${styles.financialSection}`}
+        aria-labelledby="transaction-summary-heading"
+      >
+        <h3 id="transaction-summary-heading" className={styles.sectionTitle}>
+          Summary
+        </h3>
         <dl className={styles.rows}>
           <div className={styles.row}>
             <dt>Amount</dt>
