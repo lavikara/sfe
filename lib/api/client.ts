@@ -42,7 +42,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<ApiSucc
     throw new ApiError(
       res.status,
       errorBody?.code ?? 'HTTP_ERROR',
-      errorBody?.message ?? res.statusText ?? `Request failed with status ${res.status}`,
+      errorBody?.message ?? res.statusText ?? `Request failed with status ${res.status}`
     )
   }
 

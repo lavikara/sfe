@@ -13,14 +13,14 @@ export const useUserStore = create<UserState>((set) => ({
   userLoading: true,
 
   fetchLoggedInUser: async () => {
-    set({ userLoading: true });
+    set({ userLoading: true })
     try {
       const response = await getMe()
       set({ user: response.data })
-      set({ userLoading: false });
+      set({ userLoading: false })
     } catch (err) {
       console.error('Error fetching logged-in user:', err)
-      set({ userLoading: false });
+      set({ userLoading: false })
     }
   },
 }))

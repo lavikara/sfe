@@ -62,7 +62,7 @@ function getTransactionsQuery(
   limit: number,
   queryText: string,
   type: (typeof TRANSACTION_TYPE)[number] | undefined,
-  status: (typeof TRANSACTION_STATUS)[number] | undefined,
+  status: (typeof TRANSACTION_STATUS)[number] | undefined
 ): TransactionQuery {
   const normalizedQueryText = queryText.trim()
 
@@ -89,19 +89,12 @@ export function AllTransactions() {
   const type = TRANSACTION_TYPE.find((value) => value === searchParams.get('type'))
   const status = TRANSACTION_STATUS.find((value) => value === searchParams.get('status'))
 
-  const {
-    transactions,
-    transactionsLoading,
-    transactionsError,
-    transactionsMeta,
-    fetchTransactions,
-  } = useTransactionsStore()
+  const { transactions, transactionsLoading, transactionsError, transactionsMeta, fetchTransactions } =
+    useTransactionsStore()
 
   const transactionGroups = groupTransactionsByDate(transactions ?? [])
   const hasActiveFilters = Boolean(
-    normalizedQueryText ||
-    (type && type !== 'all_types') ||
-    (status && status !== 'all_statuses'),
+    normalizedQueryText || (type && type !== 'all_types') || (status && status !== 'all_statuses')
   )
 
   useEffect(() => {
@@ -159,10 +152,7 @@ export function AllTransactions() {
       <Drawer open={selected !== null} title="Transaction details" onClose={() => setSelected(null)}>
         {selected && <TransactionDetails transaction={selected} />}
       </Drawer>
-      <Pagination
-        pagination={transactionsMeta}
-        onPageChange={setPage}
-      />
+      <Pagination pagination={transactionsMeta} onPageChange={setPage} />
     </>
   )
 }

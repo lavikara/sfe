@@ -17,12 +17,12 @@ describe('API client', () => {
         json: vi.fn().mockResolvedValue({
           error: { code: 'SERVICE_UNAVAILABLE', message: 'Please retry later' },
         }),
-      }),
+      })
     )
     vi.spyOn(console, 'log').mockImplementation(() => {})
 
     await expect(api.get('/transactions')).rejects.toEqual(
-      new ApiError(503, 'SERVICE_UNAVAILABLE', 'Please retry later'),
+      new ApiError(503, 'SERVICE_UNAVAILABLE', 'Please retry later')
     )
   })
 })

@@ -5,9 +5,7 @@ import { useUserStore } from '@/store/userStore'
 import styles from './page.module.css'
 
 export default function DashboardPage() {
-
-  const { user,userLoading } = useUserStore()
-
+  const { user, userLoading } = useUserStore()
 
   return (
     <div className={styles.page}>

@@ -1,68 +1,64 @@
-'use client';
+'use client'
 
 import type { PageMeta } from '@/types/api'
-import styles from './Pagination.module.css';
+import styles from './Pagination.module.css'
 
 export interface PaginationProps {
-  pagination?: PageMeta | null;
-  onPageChange: (page: number) => void;
-  ariaLabel?: string;
+  pagination?: PageMeta | null
+  onPageChange: (page: number) => void
+  ariaLabel?: string
 }
 
-type PageItem = number | 'ellipsis-start' | 'ellipsis-end';
+type PageItem = number | 'ellipsis-start' | 'ellipsis-end'
 
-export function Pagination({
-  pagination,
-  onPageChange,
-  ariaLabel = 'Pagination',
-}: PaginationProps) {
+export function Pagination({ pagination, onPageChange, ariaLabel = 'Pagination' }: PaginationProps) {
   if (!pagination) {
-    return null;
+    return null
   }
-  const { total, limit } = pagination;
-  const totalPages = Math.max(1, Math.ceil(total / limit));
-  const safePage = Math.min(Math.max(pagination.page, 1), totalPages);
+  const { total, limit } = pagination
+  const totalPages = Math.max(1, Math.ceil(total / limit))
+  const safePage = Math.min(Math.max(pagination.page, 1), totalPages)
 
-  const firstItem = total === 0 ? 0 : (safePage - 1) * limit + 1;
-  const lastItem = Math.min(safePage * limit, total);
+  const firstItem = total === 0 ? 0 : (safePage - 1) * limit + 1
+  const lastItem = Math.min(safePage * limit, total)
 
-  const isFirstPage = safePage === 1;
-  const isLastPage = safePage === totalPages;
-  const items: PageItem[] = [];
+  const isFirstPage = safePage === 1
+  const isLastPage = safePage === totalPages
+  const items: PageItem[] = []
 
   if (totalPages <= 7) {
     for (let page = 1; page <= totalPages; page++) {
-      items.push(page);
+      items.push(page)
     }
   } else {
-    let windowStart = Math.max(2, safePage - 1);
-    let windowEnd = Math.min(totalPages - 1, safePage + 1);
+    let windowStart = Math.max(2, safePage - 1)
+    let windowEnd = Math.min(totalPages - 1, safePage + 1)
 
     if (safePage <= 2) {
-      windowStart = 2;
-      windowEnd = 3;
+      windowStart = 2
+      windowEnd = 3
     }
 
     if (safePage >= totalPages - 1) {
-      windowStart = totalPages - 2;
-      windowEnd = totalPages - 1;
+      windowStart = totalPages - 2
+      windowEnd = totalPages - 1
     }
 
-    items.push(1);
+    items.push(1)
 
     if (windowStart > 2) {
-      items.push('ellipsis-start');
+      items.push('ellipsis-start')
     }
 
     for (let page = windowStart; page <= windowEnd; page++) {
-      items.push(page);
+      items.push(page)
     }
 
     if (windowEnd < totalPages - 1) {
-      items.push('ellipsis-end');
+      items.push('ellipsis-end')
     }
 
-    items.push(totalPages);
+    items.push(totalPages)
   }
 
   return (
@@ -105,10 +101,10 @@ export function Pagination({
                 <li key={item} className={styles.ellipsis} aria-hidden="true">
                   …
                 </li>
-              );
+              )
             }
 
-            const isCurrent = item === safePage;
+            const isCurrent = item === safePage
 
             return (
               <li key={item}>
@@ -122,7 +118,7 @@ export function Pagination({
                   {item}
                 </button>
               </li>
-            );
+            )
           })}
         </ul>
 
@@ -156,5 +152,5 @@ export function Pagination({
         </button>
       </nav>
     </div>
-  );
+  )
 }

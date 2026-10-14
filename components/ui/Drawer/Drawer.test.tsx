@@ -7,7 +7,7 @@ describe('Drawer', () => {
     render(
       <Drawer open title="Transaction details" onClose={onClose}>
         Drawer content
-      </Drawer>,
+      </Drawer>
     )
 
     expect(screen.getByRole('dialog', { name: 'Transaction details' })).toBeInTheDocument()
@@ -20,7 +20,7 @@ describe('Drawer', () => {
     render(
       <Drawer open title="Transaction details" onClose={onClose}>
         Drawer content
-      </Drawer>,
+      </Drawer>
     )
 
     fireEvent.click(screen.getByText('Drawer content'))

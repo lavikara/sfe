@@ -60,9 +60,7 @@ describe('transactions store', () => {
     const secondResponse = new Promise<Awaited<ReturnType<typeof getTransactions>>>((resolve) => {
       resolveSecond = resolve
     })
-    vi.mocked(getTransactions)
-      .mockReturnValueOnce(firstResponse)
-      .mockReturnValueOnce(secondResponse)
+    vi.mocked(getTransactions).mockReturnValueOnce(firstResponse).mockReturnValueOnce(secondResponse)
 
     const firstRequest = useTransactionsStore.getState().fetchTransactions({ q: 'older' })
     const secondRequest = useTransactionsStore.getState().fetchTransactions({ q: 'newer' })

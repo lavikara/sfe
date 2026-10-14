@@ -19,10 +19,9 @@ export function BalanceSummary({ wallets }: { wallets: Wallet[] | null }) {
   const currencies = useMemo(
     () =>
       CURRENCIES.filter(
-        (currency) =>
-          currency !== 'NGN' && (wallets ?? []).some((wallet) => wallet.currency === currency),
+        (currency) => currency !== 'NGN' && (wallets ?? []).some((wallet) => wallet.currency === currency)
       ),
-    [wallets],
+    [wallets]
   )
   const currencyKey = currencies.join(',')
 
@@ -31,33 +30,30 @@ export function BalanceSummary({ wallets }: { wallets: Wallet[] | null }) {
 
     if (!currencyKey) return
 
-    void fetchRates(currencies.map((from) => ({ from, to: 'NGN' }))).then(
-      (rates) => {
-        if (!active) return
-        if (!rates) {
-          setRateRequest({ currencyKey, rates: {}, status: 'error' })
-          return
-        }
-        setRateRequest({
-          currencyKey,
-          rates: rates.reduce<Partial<Record<Currency, Rate>>>((ratesByCurrency, rate) => {
-            ratesByCurrency[rate.from] = rate
-            return ratesByCurrency
-          }, {}),
-          status: 'ready',
-        })
-      },
-    )
+    void fetchRates(currencies.map((from) => ({ from, to: 'NGN' }))).then((rates) => {
+      if (!active) return
+      if (!rates) {
+        setRateRequest({ currencyKey, rates: {}, status: 'error' })
+        return
+      }
+      setRateRequest({
+        currencyKey,
+        rates: rates.reduce<Partial<Record<Currency, Rate>>>((ratesByCurrency, rate) => {
+          ratesByCurrency[rate.from] = rate
+          return ratesByCurrency
+        }, {}),
+        status: 'ready',
+      })
+    })
 
     return () => {
       active = false
     }
   }, [currencies, currencyKey, fetchRates])
 
-  const currentRateRequest =
-    rateRequest?.currencyKey === currencyKey ? rateRequest : null
+  const currentRateRequest = rateRequest?.currencyKey === currencyKey ? rateRequest : null
   const rates = currentRateRequest?.rates ?? {}
-  const rateStatus = currencyKey ? currentRateRequest?.status ?? 'loading' : 'ready'
+  const rateStatus = currencyKey ? (currentRateRequest?.status ?? 'loading') : 'ready'
   const total =
     wallets?.reduce((sum, wallet) => {
       if (wallet.currency === 'NGN') return sum + wallet.balance
@@ -65,8 +61,7 @@ export function BalanceSummary({ wallets }: { wallets: Wallet[] | null }) {
       return rate === undefined ? sum : sum + Math.round(wallet.balance * rate)
     }, 0) ?? 0
   const hasAllRequiredRates =
-    wallets?.every((wallet) => wallet.currency === 'NGN' || rates[wallet.currency] !== undefined) ??
-    false
+    wallets?.every((wallet) => wallet.currency === 'NGN' || rates[wallet.currency] !== undefined) ?? false
   const canDisplayTotal = rateStatus === 'ready' && hasAllRequiredRates
   const isCalculating = wallets === null || (rateStatus === 'loading' && !canDisplayTotal)
 

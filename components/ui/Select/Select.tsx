@@ -35,9 +35,7 @@ export function Select({
   const listboxId = `${generatedId}-listbox`
   const rootRef = useRef<HTMLDivElement>(null)
   const selectRef = useRef<HTMLSelectElement>(null)
-  const [uncontrolledValue, setUncontrolledValue] = useState(
-    String(defaultValue ?? options[0]?.value ?? ''),
-  )
+  const [uncontrolledValue, setUncontrolledValue] = useState(String(defaultValue ?? options[0]?.value ?? ''))
   const [open, setOpen] = useState(false)
 
   const requestedValue = value === undefined ? uncontrolledValue : String(value)
@@ -72,10 +70,7 @@ export function Select({
     setUncontrolledValue(option.value)
     const select = selectRef.current
     if (select) {
-      const valueSetter = Object.getOwnPropertyDescriptor(
-        HTMLSelectElement.prototype,
-        'value',
-      )?.set
+      const valueSetter = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value')?.set
       valueSetter?.call(select, option.value)
       select.dispatchEvent(new Event('change', { bubbles: true }))
     }
@@ -176,7 +171,7 @@ export function Select({
               className={cx(
                 styles.option,
                 option.value === selectedValue && styles.activeOption,
-                option.disabled && styles.disabledOption,
+                option.disabled && styles.disabledOption
               )}
               role="option"
               aria-selected={option.value === selectedValue}

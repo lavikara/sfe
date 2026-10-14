@@ -7,7 +7,10 @@ export interface TransactionNotFoundProps {
 
 export function TransactionNotFound({ onBackToTransactions }: TransactionNotFoundProps) {
   return (
-    <section className={`${styles.panel} ${styles.notFoundPanel}`} aria-labelledby="transaction-not-found-title">
+    <section
+      className={`${styles.panel} ${styles.notFoundPanel}`}
+      aria-labelledby="transaction-not-found-title"
+    >
       <div className={styles.content}>
         <span className={styles.iconCircle} aria-hidden="true">
           <Icon name="search" size={30} />

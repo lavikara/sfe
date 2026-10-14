@@ -7,7 +7,7 @@ interface RateState {
   ratesLoading: boolean
   ratesError: boolean
   fetchRates: (
-    query: { from: Currency; to: Currency } | Array<{ from: Currency; to: Currency }>,
+    query: { from: Currency; to: Currency } | Array<{ from: Currency; to: Currency }>
   ) => Promise<Rate[] | null>
 }
 

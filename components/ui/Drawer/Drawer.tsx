@@ -31,7 +31,9 @@ export function Drawer({ open, title, onClose, children, footer }: DrawerProps) 
         onClick={(event) => event.stopPropagation()}
       >
         <header className={styles.header}>
-          <h2 id={titleId} className={styles.title}>{title}</h2>
+          <h2 id={titleId} className={styles.title}>
+            {title}
+          </h2>
           <button type="button" className={styles.close} onClick={onClose} aria-label="Close dialog">
             <Icon name="close" size={20} />
           </button>

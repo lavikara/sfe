@@ -29,7 +29,7 @@ describe('Pagination', () => {
       <Pagination
         pagination={{ ...pagination, page: onPageChange.mock.calls[0][0] }}
         onPageChange={onPageChange}
-      />,
+      />
     )
     fireEvent.click(screen.getByRole('button', { name: /previous/i }))
 
@@ -37,12 +37,7 @@ describe('Pagination', () => {
   })
 
   it('shows a valid first page for an empty result set', () => {
-    render(
-      <Pagination
-        pagination={{ page: 1, limit: 20, total: 0, totalPages: 0 }}
-        onPageChange={vi.fn()}
-      />,
-    )
+    render(<Pagination pagination={{ page: 1, limit: 20, total: 0, totalPages: 0 }} onPageChange={vi.fn()} />)
 
     expect(screen.getByText('Showing 0–0 of 0')).toBeInTheDocument()
     expect(screen.getByText('Page 1 of 1')).toBeInTheDocument()

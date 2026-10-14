@@ -144,7 +144,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-
 @media (max-width: 640px) {
   .root {
     display: block;
@@ -175,4 +174,3 @@
     padding: 0 var(--space-4);
   }
 }
-

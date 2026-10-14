@@ -38,7 +38,7 @@ describe('BalanceSummary', () => {
     vi.mocked(getRate).mockReturnValue(
       new Promise((resolve) => {
         resolveRate = resolve
-      }),
+      })
     )
     render(<BalanceSummary wallets={[{ currency: 'USD', balance: 234075 }]} />)
 
@@ -72,7 +72,7 @@ describe('BalanceSummary', () => {
           { currency: 'GHS', balance: 85020 },
           { currency: 'USD', balance: 100 },
         ]}
-      />,
+      />
     )
 
     await waitFor(() => {

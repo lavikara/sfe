@@ -29,10 +29,8 @@ function TransactionsContent() {
   const searchParam = searchParams.get('q') ?? ''
   const rawType = searchParams.get('type')
   const rawStatus = searchParams.get('status')
-  const type: TransactionType =
-    TRANSACTION_TYPE.find((value) => value === rawType) ?? 'all_types'
-  const status: TransactionStatus =
-    TRANSACTION_STATUS.find((value) => value === rawStatus) ?? 'all_statuses'
+  const type: TransactionType = TRANSACTION_TYPE.find((value) => value === rawType) ?? 'all_types'
+  const status: TransactionStatus = TRANSACTION_STATUS.find((value) => value === rawStatus) ?? 'all_statuses'
 
   const [searchInput, setSearchInput] = useState(searchParam)
   const lastWrittenSearch = useRef(searchParam)
@@ -51,7 +49,7 @@ function TransactionsContent() {
       const query = params.toString()
       router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
     },
-    [pathname, router, searchParams],
+    [pathname, router, searchParams]
   )
 
   useEffect(() => {

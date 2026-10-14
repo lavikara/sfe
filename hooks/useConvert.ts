@@ -26,7 +26,7 @@ export function useConvert() {
         setSubmitting(false)
       }
     },
-    [submitting],
+    [submitting]
   )
 
   return { result, error, submitting, handleConvert }

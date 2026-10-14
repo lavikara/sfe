@@ -34,19 +34,14 @@ describe('Select', () => {
     expect(trigger).toHaveTextContent('Nigerian naira')
     expect(trigger).toHaveAttribute(
       'aria-activedescendant',
-      screen.getByRole('option', { name: 'US dollars' }).id,
+      screen.getByRole('option', { name: 'US dollars' }).id
     )
-    expect(screen.getByRole('option', { name: 'Nigerian naira' })).toHaveAttribute(
-      'aria-selected',
-      'true',
-    )
+    expect(screen.getByRole('option', { name: 'Nigerian naira' })).toHaveAttribute('aria-selected', 'true')
   })
 
   it('does not change the displayed value in controlled mode until the parent updates it', () => {
     const onChange = vi.fn()
-    const { rerender } = render(
-      <Select label="Currency" options={options} value="USD" onChange={onChange} />,
-    )
+    const { rerender } = render(<Select label="Currency" options={options} value="USD" onChange={onChange} />)
     const trigger = screen.getByRole('combobox', { name: 'Currency' })
 
     fireEvent.click(trigger)
@@ -92,21 +87,19 @@ describe('Select', () => {
     fireEvent.keyDown(trigger, { key: 'End' })
     expect(trigger).toHaveAttribute(
       'aria-activedescendant',
-      screen.getByRole('option', { name: 'Nigerian naira' }).id,
+      screen.getByRole('option', { name: 'Nigerian naira' }).id
     )
 
     fireEvent.keyDown(trigger, { key: 'Home' })
     expect(trigger).toHaveAttribute(
       'aria-activedescendant',
-      screen.getByRole('option', { name: 'US dollars' }).id,
+      screen.getByRole('option', { name: 'US dollars' }).id
     )
   })
 
   it('does not select a disabled option when clicked', () => {
     const onChange = vi.fn()
-    render(
-      <Select label="Currency" options={optionsWithDisabled} defaultValue="USD" onChange={onChange} />,
-    )
+    render(<Select label="Currency" options={optionsWithDisabled} defaultValue="USD" onChange={onChange} />)
     const trigger = screen.getByRole('combobox', { name: 'Currency' })
 
     fireEvent.click(trigger)

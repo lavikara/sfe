@@ -1,6 +1,6 @@
 import type { Transaction, TransactionType } from '@/types/api'
 import { Icon, type IconName, Money } from '@/components/ui'
-import { formatTime,getInitials, TRANSACTION_TYPE_LABELS } from '@/lib/format'
+import { formatTime, getInitials, TRANSACTION_TYPE_LABELS } from '@/lib/format'
 import { StatusDot } from './StatusDot'
 import styles from './TransactionRow.module.css'
 

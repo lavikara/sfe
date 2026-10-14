@@ -45,9 +45,7 @@ export function RecentTransactions() {
       ) : !transactions?.length ? (
         <NoTransactionsYet />
       ) : (
-        transactions.map((tx) => (
-          <TransactionRow key={tx.id} transaction={tx} onSelect={setSelected} />
-        ))
+        transactions.map((tx) => <TransactionRow key={tx.id} transaction={tx} onSelect={setSelected} />)
       )}
       <Drawer open={selected !== null} title="Transaction details" onClose={() => setSelected(null)}>
         {selected && <TransactionDetails transaction={selected} />}
