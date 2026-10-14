@@ -17,7 +17,61 @@
   letter-spacing: -0.02em;
 }
 
+.spinner {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  vertical-align: 0.08em;
+}
 
+.spinnerDot {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  border-radius: var(--radius-full);
+  background: var(--color-border-strong);
+  animation: pulse 1.2s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.spinnerDotCenter {
+  width: 24px;
+  height: 24px;
+  background: var(--color-text-subtle);
+  animation-delay: 160ms;
+}
+
+.spinnerDotLast {
+  width: 18px;
+  height: 18px;
+  animation-delay: 320ms;
+}
+
+.error {
+  margin-top: var(--space-2);
+  color: var(--color-danger);
+  font-size: var(--text-xs);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.82);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinnerDot {
+    animation: none;
+    will-change: auto;
+  }
+}
 
 @media (max-width: 640px) {
   .toggleLabel {
