@@ -5,7 +5,6 @@ import { AllTransactions } from '@/components/transactions'
 import { Input, Select } from '@/components/ui'
 import type { TransactionType, TransactionStatus } from '@/types/api'
 import { TRANSACTION_TYPE, TRANSACTION_STATUS } from '@/types/api'
-import { useUserStore } from '@/store/userStore'
 import { useTransactionsStore } from '@/store/transactionsStore'
 import styles from './page.module.css'
 
@@ -38,7 +37,6 @@ function TransactionsContent() {
   const [searchInput, setSearchInput] = useState(searchParam)
   const lastWrittenSearch = useRef(searchParam)
 
-  const { userLoading } = useUserStore()
   const { transactionsMeta } = useTransactionsStore()
 
   const updateParam = useCallback(
@@ -87,8 +85,6 @@ function TransactionsContent() {
     const { value } = event.target
     updateParam('status', value === 'all_statuses' ? '' : value)
   }
-
-  if (userLoading) return <p className={styles.loading}>Loading…</p>
 
   return (
     <div className={styles.page}>
