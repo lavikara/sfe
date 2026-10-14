@@ -4,7 +4,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import type { Transaction } from '@/types/api'
 import { TRANSACTION_STATUS, TRANSACTION_TYPE } from '@/types/api'
 import type { TransactionQuery } from '@/lib/api/endpoints'
-import { Pagination, Card, Drawer, TransactionsLoading } from '@/components/ui'
+import { Pagination, Card, Drawer, NoTransactionsMatch, TransactionsLoading } from '@/components/ui'
 import { TransactionDetails, TransactionRow } from '@/components/transactions'
 import { useTransactionsStore } from '@/store/transactionsStore'
 import styles from './AllTransactions.module.css'
@@ -65,6 +65,11 @@ export function AllTransactions() {
   const { transactions, transactionsLoading, transactionsMeta, fetchTransactions } = useTransactionsStore()
 
   const transactionGroups = groupTransactionsByDate(transactions ?? [])
+  const hasActiveFilters = Boolean(
+    queryText.trim() ||
+    (type && type !== 'all_types') ||
+    (status && status !== 'all_statuses'),
+  )
 
   useEffect(() => {
     const query: TransactionQuery = {
@@ -90,24 +95,36 @@ export function AllTransactions() {
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
   }
 
+  const clearFilters = () => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete('q')
+    params.delete('type')
+    params.delete('status')
+    params.delete('page')
+    const query = params.toString()
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
+  }
+
   return (
     <>
       {transactionsLoading ? (
         <TransactionsLoading />
+      ) : transactionGroups.length ? (
+        <Card padding="none" className={styles.card}>
+          {transactionGroups.map((group) => (
+            <section className={styles.group} key={group.key}>
+              <h2 className={styles.groupHeading}>{group.label}</h2>
+              {group.transactions.map((tx) => (
+                <TransactionRow key={tx.id} transaction={tx} onSelect={setSelected} />
+              ))}
+            </section>
+          ))}
+        </Card>
+      ) : hasActiveFilters ? (
+        <NoTransactionsMatch onClearFilters={clearFilters} />
       ) : (
         <Card padding="none" className={styles.card}>
-          {transactionGroups.length ? (
-            transactionGroups.map((group) => (
-              <section className={styles.group} key={group.key}>
-                <h2 className={styles.groupHeading}>{group.label}</h2>
-                {group.transactions.map((tx) => (
-                  <TransactionRow key={tx.id} transaction={tx} onSelect={setSelected} />
-                ))}
-              </section>
-            ))
-          ) : (
-            <p className={styles.message}>No transactions found.</p>
-          )}
+          <p className={styles.message}>No transactions found.</p>
         </Card>
       )}
       <Drawer open={selected !== null} title="Transaction details" onClose={() => setSelected(null)}>
