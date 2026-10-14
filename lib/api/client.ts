@@ -36,7 +36,6 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<ApiSucc
     },
   })
   const body = await res.json()
-  console.log('[api]', path, body)
 
   if (!res.ok) {
     const errorBody = isApiErrorBody(body) ? body.error : null
