@@ -1,5 +1,5 @@
 'use client'
-import type { ReactNode } from 'react'
+import { useId, type ReactNode } from 'react'
 import { Icon } from '../Icon'
 import styles from './Drawer.module.css'
 
@@ -12,20 +12,35 @@ export interface DrawerProps {
 }
 
 export function Drawer({ open, title, onClose, children, footer }: DrawerProps) {
+  const titleId = useId()
   if (!open) return null
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.panel}>
-        <div className={styles.header}>
-          <h2 className={styles.title}>{title}</h2>
-          <span className={styles.close} onClick={onClose}>
+    <div
+      className={styles.overlay}
+      onClick={onClose}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape') onClose()
+      }}
+    >
+      <section
+        className={styles.panel}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        onClick={(event) => event.stopPropagation()}
+      >
+        <header className={styles.header}>
+          <h2 id={titleId} className={styles.title}>
+            {title}
+          </h2>
+          <button type="button" className={styles.close} onClick={onClose} aria-label="Close dialog">
             <Icon name="close" size={20} />
-          </span>
-        </div>
+          </button>
+        </header>
         <div className={styles.body}>{children}</div>
         {footer && <div className={styles.footer}>{footer}</div>}
-      </div>
+      </section>
     </div>
   )
 }

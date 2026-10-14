@@ -1,10 +1,12 @@
 'use client'
 import { useEffect, useState } from 'react'
-import type { ApiErrorBody, Conversion, Currency, Rate, User } from '@/types/api'
+import type { Currency } from '@/types/api'
 import { CURRENCIES } from '@/types/api'
 import { Button, Card, Input, Money, Select } from '@/components/ui'
-import { convert, getMe, getRate } from '@/lib/api/endpoints'
+import { useUserStore } from '@/store/userStore'
+import { useRatesStore } from '@/store/rateStore'
 import { parseMoney } from '@/lib/format'
+import { useConvert } from '@/hooks/useConvert'
 import styles from './page.module.css'
 
 const CURRENCY_OPTIONS = CURRENCIES.map((c) => ({ value: c, label: c }))
@@ -13,20 +15,14 @@ export default function ConvertPage() {
   const [from, setFrom] = useState<Currency>('USD')
   const [to, setTo] = useState<Currency>('NGN')
   const [amount, setAmount] = useState('')
-  const [result, setResult] = useState<Conversion | null>(null)
-  const [error, setError] = useState('')
-  const [submitting, setSubmitting] = useState(false)
+  const { result, error, submitting, handleConvert } = useConvert()
 
-  const [user, setUser] = useState<User>()
-  const [rate, setRate] = useState<Rate>()
+  const { user } = useUserStore()
+  const { rate, fetchRates } = useRatesStore()
 
   useEffect(() => {
-    getMe().then((res) => setUser(res.data))
-  }, [])
-
-  useEffect(() => {
-    getRate(from, to).then((res) => setRate(res.data))
-  }, [from, to])
+    fetchRates({ from, to })
+  }, [fetchRates, from, to])
 
   const value = parseMoney(amount, from) ?? 0
   const fee = Math.round(value * 0.015)
@@ -34,26 +30,10 @@ export default function ConvertPage() {
   const wallet = user?.wallets.find((w) => w.currency === from)
   const canSubmit = value > 0 && from !== to && !submitting
 
-  const handleConvert = async () => {
+  const submitConversion = async () => {
     if (!canSubmit) return
-    setError('')
-    setSubmitting(true)
-    try {
-      // The client doesn't throw on 4xx/5xx, so check for an error body.
-      const res = (await convert({ from, to, amount: value })) as Partial<ApiErrorBody> & {
-        data?: Conversion
-      }
-      if (res.error) {
-        setError(res.error.message)
-      } else if (res.data) {
-        setResult(res.data)
-        setAmount('')
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
-    } finally {
-      setSubmitting(false)
-    }
+    const conversion = await handleConvert(from, to, value)
+    if (conversion) setAmount('')
   }
 
   return (
@@ -71,7 +51,7 @@ export default function ConvertPage() {
           />
           <Input
             label="Amount"
-            type="number"
+            type="tel"
             inputMode="decimal"
             placeholder="0.00"
             value={amount}
@@ -118,7 +98,7 @@ export default function ConvertPage() {
 
         {error && <p className={styles.error}>{error}</p>}
 
-        <Button fullWidth onClick={handleConvert} disabled={!canSubmit}>
+        <Button fullWidth onClick={submitConversion} disabled={!canSubmit}>
           {submitting ? 'Converting…' : 'Convert'}
         </Button>
       </Card>

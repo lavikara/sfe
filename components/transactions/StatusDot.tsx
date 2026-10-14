@@ -5,5 +5,10 @@ import styles from './StatusDot.module.css'
 
 export function StatusDot({ status }: { status: TransactionStatus }) {
   const label = TRANSACTION_STATUS_LABELS[status]
-  return <span className={cx(styles.dot, styles[status])} role="img" aria-label={label} title={label} />
+  return (
+    <span className={cx(styles.badge, styles[status] ?? styles.reversed)}>
+      <span className={styles.dot} aria-hidden="true" />
+      {label}
+    </span>
+  )
 }

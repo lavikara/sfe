@@ -1,0 +1,418 @@
+.panel {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  min-height: 320px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.content {
+  display: flex;
+  width: min(100%, 560px);
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-8) var(--space-6);
+  text-align: center;
+}
+
+.iconCircle {
+  display: inline-flex;
+  width: 68px;
+  height: 68px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.dangerIcon {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.title {
+  color: var(--color-text);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+}
+
+.description {
+  max-width: 500px;
+  margin-top: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  overflow-wrap: anywhere;
+}
+
+.primaryButton,
+.secondaryButton {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  padding: 0 var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  white-space: normal;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
+}
+
+.primaryButton {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.primaryButton:hover {
+  background: var(--color-primary-hover);
+}
+
+.secondaryButton {
+  border-color: var(--color-border-strong);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.secondaryButton:hover {
+  background: var(--color-bg-subtle);
+}
+
+.primaryButton:focus-visible,
+.secondaryButton:focus-visible,
+.closeButton:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.notFoundPanel {
+  min-height: 480px;
+}
+
+.detailsPanel {
+  display: block;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.detailsHeader {
+  display: flex;
+  min-height: 88px;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.detailsHeader h2 {
+  min-width: 0;
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  overflow-wrap: anywhere;
+}
+
+.closeButton {
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.closeButton:hover {
+  background: var(--color-bg-subtle);
+}
+
+.detailsSkeleton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-6);
+}
+
+.detailsRows {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0 var(--space-6) var(--space-8);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.detailsSkeletonRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.listSkeleton {
+  display: block;
+  min-height: 0;
+}
+
+.listSkeletonHeader {
+  display: flex;
+  height: 48px;
+  align-items: center;
+  padding: 0 var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-subtle);
+}
+
+.listSkeletonRow {
+  display: flex;
+  min-width: 0;
+  min-height: 96px;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.listSkeletonRow:last-of-type {
+  border-bottom: 0;
+}
+
+.listSkeletonText,
+.listSkeletonAmount {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.listSkeletonText {
+  flex: 1;
+  min-width: 0;
+}
+
+.listSkeletonAmount {
+  flex: none;
+  align-items: flex-end;
+}
+
+.skeleton {
+  display: block;
+  flex: none;
+  border-radius: var(--radius-full);
+  background: var(--color-bg);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.avatarSkeleton {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+}
+
+.shortCenteredSkeleton {
+  width: min(225px, 55%);
+  height: 16px;
+}
+
+.wideCenteredSkeleton {
+  width: min(285px, 72%);
+  height: 34px;
+  border-radius: var(--radius-sm);
+}
+
+.pillSkeleton {
+  width: 118px;
+  height: 31px;
+}
+
+.detailLabelSkeleton,
+.detailValueSkeleton {
+  width: min(160px, 35%);
+  height: 17px;
+}
+
+.detailValueSkeleton {
+  width: min(200px, 45%);
+}
+
+.headerSkeleton {
+  width: 90px;
+  height: 14px;
+}
+
+.shortSkeleton {
+  width: min(170px, 65%);
+  height: 17px;
+}
+
+.longSkeleton {
+  width: min(370px, 90%);
+  height: 17px;
+}
+
+.listSkeletonAmount .shortSkeleton {
+  width: 136px;
+}
+
+.tinySkeleton {
+  width: 56px;
+  height: 14px;
+}
+
+.walletLoadingGrid {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.walletSkeleton {
+  display: flex;
+  min-width: 0;
+  min-height: 132px;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.walletLabelSkeleton {
+  width: 96px;
+  height: 14px;
+}
+
+.walletBalanceSkeleton {
+  width: min(190px, 85%);
+  height: 28px;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (max-width: 640px) {
+  .panel {
+    min-height: 280px;
+  }
+
+  .content {
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .iconCircle {
+    width: 60px;
+    height: 60px;
+  }
+
+  .title {
+    font-size: var(--text-md);
+  }
+
+  .description {
+    font-size: var(--text-sm);
+  }
+
+  .notFoundPanel {
+    min-height: 360px;
+  }
+
+  .detailsHeader {
+    min-height: 68px;
+    gap: var(--space-2);
+    padding: var(--space-3);
+  }
+
+  .detailsHeader h2 {
+    font-size: var(--text-lg);
+  }
+
+  .detailsRows {
+    margin-right: var(--space-3);
+    margin-left: var(--space-3);
+  }
+
+  .listSkeletonHeader {
+    padding: 0 var(--space-4);
+  }
+
+  .listSkeletonRow {
+    min-height: 80px;
+    gap: var(--space-2);
+    padding: var(--space-3);
+  }
+
+  .avatarSkeleton {
+    width: 40px;
+    height: 40px;
+  }
+
+  .walletLoadingGrid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-3);
+  }
+
+  .walletSkeleton {
+    min-height: 112px;
+    padding: var(--space-5);
+  }
+
+  .listSkeletonAmount .shortSkeleton {
+    width: min(120px, 28vw);
+  }
+
+  .tinySkeleton {
+    width: min(48px, 15vw);
+  }
+}
+
+@media (max-width: 360px) {
+  .content {
+    padding-right: var(--space-3);
+    padding-left: var(--space-3);
+  }
+
+  .primaryButton,
+  .secondaryButton {
+    min-height: 44px;
+    padding: 0 var(--space-3);
+    font-size: var(--text-md);
+  }
+
+  .detailsHeader h2 {
+    font-size: var(--text-md);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
