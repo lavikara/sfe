@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import type { Transaction } from '@/types/api'
-import { Card, CardHeader, Drawer, TransactionsLoading } from '@/components/ui'
+import { Card, CardHeader, Drawer, NoTransactionsYet, TransactionsLoading } from '@/components/ui'
 import { TransactionDetails, TransactionRow } from '@/components/transactions'
 import { useTransactionsStore } from '@/store/transactionsStore'
 import type { TransactionQuery } from '@/lib/api/endpoints'
@@ -32,9 +32,7 @@ export function RecentTransactions() {
         />
       </div>
       {transactionsLoading && <TransactionsLoading count={5} />}
-      {!transactionsLoading && !transactions?.length && (
-        <p className={styles.message}>No transactions yet.</p>
-      )}
+      {!transactionsLoading && !transactions?.length && <NoTransactionsYet />}
       {transactions?.map((tx) => (
         <TransactionRow key={tx.id} transaction={tx} onSelect={setSelected} />
       ))}
